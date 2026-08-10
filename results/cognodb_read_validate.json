@@ -1,0 +1,125 @@
+{
+  "platform": "cognodb",
+  "phase": "read",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T09:05:37Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 244.686,
+      "p95_ms": 314.687,
+      "p99_ms": 328.795,
+      "min_ms": 242.694,
+      "max_ms": 328.795,
+      "mean_ms": 255.242,
+      "stdev_ms": 21.722
+    },
+    "iterations": 15,
+    "warmup": 3,
+    "start_nodes_used": 200,
+    "verified_counts": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "workloads": {
+      "hop1": {
+        "n": 15,
+        "p50_ms": 245.979,
+        "p95_ms": 306.434,
+        "p99_ms": 306.434,
+        "min_ms": 243.205,
+        "max_ms": 306.434,
+        "mean_ms": 255.354,
+        "stdev_ms": 18.757,
+        "failures": 0,
+        "cold_first_run_ms": 245.51,
+        "p50_net_of_rtt_ms": 1.293
+      },
+      "hop2": {
+        "n": 15,
+        "p50_ms": 246.502,
+        "p95_ms": 302.122,
+        "p99_ms": 302.122,
+        "min_ms": 243.881,
+        "max_ms": 302.122,
+        "mean_ms": 254.046,
+        "stdev_ms": 18.233,
+        "failures": 0,
+        "cold_first_run_ms": 246.054,
+        "p50_net_of_rtt_ms": 1.816
+      },
+      "hop3": {
+        "n": 15,
+        "p50_ms": 307.566,
+        "p95_ms": 484.339,
+        "p99_ms": 484.339,
+        "min_ms": 252.93,
+        "max_ms": 484.339,
+        "mean_ms": 335.625,
+        "stdev_ms": 80.201,
+        "failures": 0,
+        "cold_first_run_ms": 283.92,
+        "p50_net_of_rtt_ms": 62.88
+      },
+      "point_lookup": {
+        "n": 15,
+        "p50_ms": 244.512,
+        "p95_ms": 251.771,
+        "p99_ms": 251.771,
+        "min_ms": 242.811,
+        "max_ms": 251.771,
+        "mean_ms": 244.769,
+        "stdev_ms": 2.099,
+        "failures": 0,
+        "cold_first_run_ms": 254.986,
+        "p50_net_of_rtt_ms": -0.174
+      },
+      "indexed_filter": {
+        "n": 15,
+        "p50_ms": 247.465,
+        "p95_ms": 341.292,
+        "p99_ms": 341.292,
+        "min_ms": 244.146,
+        "max_ms": 341.292,
+        "mean_ms": 260.736,
+        "stdev_ms": 28.314,
+        "failures": 0,
+        "cold_first_run_ms": 245.45,
+        "p50_net_of_rtt_ms": 2.779
+      },
+      "agg_group_by": {
+        "n": 15,
+        "p50_ms": 289.31,
+        "p95_ms": 330.882,
+        "p99_ms": 330.882,
+        "min_ms": 286.244,
+        "max_ms": 330.882,
+        "mean_ms": 291.697,
+        "stdev_ms": 10.951,
+        "failures": 0,
+        "cold_first_run_ms": 287.893,
+        "p50_net_of_rtt_ms": 44.624
+      },
+      "agg_rel_count": {
+        "n": 15,
+        "p50_ms": 1768.395,
+        "p95_ms": 1983.982,
+        "p99_ms": 1983.982,
+        "min_ms": 1695.814,
+        "max_ms": 1983.982,
+        "mean_ms": 1796.934,
+        "stdev_ms": 80.369,
+        "failures": 0,
+        "cold_first_run_ms": 1988.415,
+        "p50_net_of_rtt_ms": 1523.709
+      }
+    }
+  },
+  "caveats": [
+    "MEASUREMENT INVALID FOR PUBLICATION: network baseline p50 is 244.686 ms, which exceeds the server-side cost of most workloads. Latency differences below ~21.722 ms (baseline stdev) are indistinguishable from network jitter. Re-run from a client in the same region as the database."
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "platform": "cognodb",
+  "phase": "load",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T08:57:52Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 239.275,
+      "p95_ms": 261.061,
+      "p99_ms": 302.714,
+      "min_ms": 237.61,
+      "max_ms": 302.714,
+      "mean_ms": 242.866,
+      "stdev_ms": 10.444
+    },
+    "dataset": {
+      "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "index_creation_ms": {
+      "paper_id": 271.93,
+      "paper_year": 247.11
+    },
+    "nodes": {
+      "rows": 27769,
+      "wall_s": 7.699,
+      "rows_per_s": 3606.8,
+      "batch_size": 1000,
+      "batches": 28,
+      "batch_latency": {
+        "n": 28,
+        "p50_ms": 262.025,
+        "p95_ms": 277.215,
+        "p99_ms": 517.596,
+        "min_ms": 253.786,
+        "max_ms": 517.596,
+        "mean_ms": 272.381,
+        "stdev_ms": 48.468
+      },
+      "first_10_batches_ms": [
+        517.6,
+        268.2,
+        264.2,
+        273.0,
+        261.7,
+        261.7,
+        254.2,
+        260.2,
+        255.3,
+        253.8
+      ],
+      "last_10_batches_ms": [
+        276.3,
+        264.4,
+        258.3,
+        271.0,
+        259.2,
+        261.9,
+        269.0,
+        268.5,
+        264.9,
+        257.4
+      ]
+    },
+    "relationships": {
+      "rows": 5000,
+      "wall_s": 1.329,
+      "rows_per_s": 3762.9,
+      "batch_size": 1000,
+      "batches": 5,
+      "batch_latency": {
+        "n": 5,
+        "p50_ms": 263.437,
+        "p95_ms": 265.549,
+        "p99_ms": 265.549,
+        "min_ms": 259.117,
+        "max_ms": 265.549,
+        "mean_ms": 262.265,
+        "stdev_ms": 2.865
+      },
+      "first_10_batches_ms": [
+        263.8,
+        265.5,
+        263.4,
+        259.1,
+        259.4
+      ],
+      "last_10_batches_ms": [
+        263.8,
+        265.5,
+        263.4,
+        259.1,
+        259.4
+      ]
+    },
+    "total_wall_s": 9.028,
+    "verified_counts": {
+      "nodes": 27769,
+      "relationships": 5000
+    }
+  },
+  "caveats": [
+    "Index readiness is not observable on this platform (no db.awaitIndexes, SHOW INDEXES.state is null). Waited 3.0s after DDL before loading.",
+    "VALIDATION RUN: edges capped at 5000. Not a publishable number."
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "platform": "cognodb",
+  "phase": "load",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T09:00:39Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 238.064,
+      "p95_ms": 306.511,
+      "p99_ms": 1118.994,
+      "min_ms": 236.472,
+      "max_ms": 1118.994,
+      "mean_ms": 253.321,
+      "stdev_ms": 89.325
+    },
+    "dataset": {
+      "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "index_creation_ms": {
+      "paper_id": 244.11,
+      "paper_year": 251.2
+    },
+    "nodes": {
+      "rows": 27769,
+      "wall_s": 9.868,
+      "rows_per_s": 2813.9,
+      "batch_size": 1000,
+      "batches": 28,
+      "batch_latency": {
+        "n": 28,
+        "p50_ms": 281.683,
+        "p95_ms": 519.18,
+        "p99_ms": 795.077,
+        "min_ms": 258.942,
+        "max_ms": 795.077,
+        "mean_ms": 348.354,
+        "stdev_ms": 130.271
+      },
+      "first_10_batches_ms": [
+        795.1,
+        519.2,
+        500.9,
+        509.7,
+        506.3,
+        514.8,
+        501.6,
+        270.3,
+        343.1,
+        264.9
+      ],
+      "last_10_batches_ms": [
+        281.7,
+        265.2,
+        265.6,
+        297.5,
+        271.6,
+        265.5,
+        268.7,
+        265.1,
+        265.7,
+        258.9
+      ]
+    },
+    "relationships": {
+      "rows": 352768,
+      "wall_s": 103.758,
+      "rows_per_s": 3399.9,
+      "batch_size": 1000,
+      "batches": 353,
+      "batch_latency": {
+        "n": 353,
+        "p50_ms": 271.075,
+        "p95_ms": 338.577,
+        "p99_ms": 918.724,
+        "min_ms": 255.028,
+        "max_ms": 1579.534,
+        "mean_ms": 289.655,
+        "stdev_ms": 100.752
+      },
+      "first_10_batches_ms": [
+        261.2,
+        271.2,
+        262.2,
+        256.7,
+        260.4,
+        269.5,
+        255.0,
+        261.3,
+        274.4,
+        272.5
+      ],
+      "last_10_batches_ms": [
+        274.4,
+        311.3,
+        300.7,
+        285.2,
+        291.4,
+        282.5,
+        285.8,
+        339.2,
+        281.4,
+        279.3
+      ]
+    },
+    "total_wall_s": 113.626,
+    "verified_counts": {
+      "nodes": 27769,
+      "relationships": 352768
+    }
+  },
+  "caveats": [
+    "Index readiness is not observable on this platform (no db.awaitIndexes, SHOW INDEXES.state is null). Waited 3.0s after DDL before loading."
+  ]
+}

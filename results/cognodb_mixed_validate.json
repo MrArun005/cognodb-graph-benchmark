@@ -1,0 +1,95 @@
+{
+  "platform": "cognodb",
+  "phase": "mixed",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T09:06:33Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 241.892,
+      "p95_ms": 306.744,
+      "p99_ms": 340.378,
+      "min_ms": 240.049,
+      "max_ms": 340.378,
+      "mean_ms": 254.933,
+      "stdev_ms": 24.648
+    },
+    "read_workload": "hop2",
+    "write_ratio": 0.1,
+    "duration_per_level_s": 6.0,
+    "scratch_nodes_removed": 110,
+    "verified_counts_after": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "levels": {
+      "1": {
+        "clients": 1,
+        "duration_s": 6.14,
+        "reads": 7,
+        "writes": 10,
+        "total_ops": 17,
+        "qps": 2.8,
+        "read_latency": {
+          "n": 7,
+          "p50_ms": 284.626,
+          "p95_ms": 699.066,
+          "p99_ms": 699.066,
+          "min_ms": 245.345,
+          "max_ms": 699.066,
+          "mean_ms": 335.956,
+          "stdev_ms": 161.224
+        },
+        "write_latency": {
+          "n": 10,
+          "p50_ms": 255.836,
+          "p95_ms": 1416.405,
+          "p99_ms": 1416.405,
+          "min_ms": 249.723,
+          "max_ms": 1416.405,
+          "mean_ms": 378.381,
+          "stdev_ms": 365.304
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "10": {
+        "clients": 10,
+        "duration_s": 6.23,
+        "reads": 103,
+        "writes": 100,
+        "total_ops": 203,
+        "qps": 32.6,
+        "read_latency": {
+          "n": 103,
+          "p50_ms": 244.976,
+          "p95_ms": 253.613,
+          "p99_ms": 257.734,
+          "min_ms": 238.6,
+          "max_ms": 262.931,
+          "mean_ms": 245.569,
+          "stdev_ms": 4.335
+        },
+        "write_latency": {
+          "n": 100,
+          "p50_ms": 262.376,
+          "p95_ms": 1321.398,
+          "p99_ms": 1376.378,
+          "min_ms": 246.739,
+          "max_ms": 1376.378,
+          "mean_ms": 359.217,
+          "stdev_ms": 307.44
+        },
+        "errors": 0,
+        "error_samples": []
+      }
+    }
+  },
+  "caveats": [
+    "Throughput is network-bound: baseline RTT p50 241.892 ms caps per-client QPS at ~4.1. Concurrency scaling here measures the client's ability to hide RTT, not server capacity. Re-run in-region."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
+  "source": "https://snap.stanford.edu/data/cit-HepTh.html",
+  "raw_files": {
+    "cit-HepTh.txt.gz": "7df944b502bd7b687b0e7e94ba9b0a87f202693254558ae5f8ea45657697eb32",
+    "cit-HepTh-dates.txt.gz": "4b5f2259b0feb848a2a93ab3345d344a4b1c3c9c773ddebcab95f2f6e0bf6225"
+  },
+  "canonical_files": {
+    "nodes.csv": "682c05df8bd54289fd7919c1b3601bca56a0efdab6f4e71ae28769e16b75dc05",
+    "edges.csv": "0907ed5b2117de9ddaaff8906b9e122a443f1c9b0c03e0b2b574912020bc1bba"
+  },
+  "nodes": 27769,
+  "relationships": 352768,
+  "nodes_with_date": 11441,
+  "nodes_without_date": 16328,
+  "self_loops_removed": 39,
+  "duplicate_edges_removed": 0,
+  "start_nodes": {
+    "count": 200,
+    "seed": 42,
+    "min_out_degree": 3
+  },
+  "schema": {
+    "node": "(:Paper {id: int, date: string, year: int})",
+    "relationship": "(:Paper)-[:CITES]->(:Paper)"
+  }
+}
