@@ -1,0 +1,123 @@
+{
+  "platform": "memgraph",
+  "phase": "read",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T10:30:40Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 0.301,
+      "p95_ms": 0.866,
+      "p99_ms": 52.429,
+      "min_ms": 0.244,
+      "max_ms": 52.429,
+      "mean_ms": 0.88,
+      "stdev_ms": 5.212
+    },
+    "iterations": 120,
+    "warmup": 20,
+    "start_nodes_used": 200,
+    "verified_counts": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "workloads": {
+      "hop1": {
+        "n": 120,
+        "p50_ms": 0.359,
+        "p95_ms": 1.109,
+        "p99_ms": 1.779,
+        "min_ms": 0.241,
+        "max_ms": 2.685,
+        "mean_ms": 0.462,
+        "stdev_ms": 0.323,
+        "failures": 0,
+        "cold_first_run_ms": 4.175,
+        "p50_net_of_rtt_ms": 0.058
+      },
+      "hop2": {
+        "n": 120,
+        "p50_ms": 0.39,
+        "p95_ms": 0.988,
+        "p99_ms": 1.321,
+        "min_ms": 0.264,
+        "max_ms": 1.427,
+        "mean_ms": 0.466,
+        "stdev_ms": 0.218,
+        "failures": 0,
+        "cold_first_run_ms": 0.489,
+        "p50_net_of_rtt_ms": 0.089
+      },
+      "hop3": {
+        "n": 120,
+        "p50_ms": 1.276,
+        "p95_ms": 7.678,
+        "p99_ms": 49.646,
+        "min_ms": 0.359,
+        "max_ms": 59.854,
+        "mean_ms": 3.422,
+        "stdev_ms": 8.514,
+        "failures": 0,
+        "cold_first_run_ms": 1.99,
+        "p50_net_of_rtt_ms": 0.975
+      },
+      "point_lookup": {
+        "n": 120,
+        "p50_ms": 0.346,
+        "p95_ms": 0.507,
+        "p99_ms": 0.897,
+        "min_ms": 0.288,
+        "max_ms": 19.434,
+        "mean_ms": 0.523,
+        "stdev_ms": 1.743,
+        "failures": 0,
+        "cold_first_run_ms": 0.594,
+        "p50_net_of_rtt_ms": 0.045
+      },
+      "indexed_filter": {
+        "n": 120,
+        "p50_ms": 0.427,
+        "p95_ms": 0.664,
+        "p99_ms": 0.915,
+        "min_ms": 0.272,
+        "max_ms": 0.948,
+        "mean_ms": 0.454,
+        "stdev_ms": 0.117,
+        "failures": 0,
+        "cold_first_run_ms": 0.55,
+        "p50_net_of_rtt_ms": 0.126
+      },
+      "agg_group_by": {
+        "n": 120,
+        "p50_ms": 2.356,
+        "p95_ms": 5.081,
+        "p99_ms": 44.138,
+        "min_ms": 2.053,
+        "max_ms": 47.523,
+        "mean_ms": 4.264,
+        "stdev_ms": 8.32,
+        "failures": 0,
+        "cold_first_run_ms": 5.386,
+        "p50_net_of_rtt_ms": 2.055
+      },
+      "agg_rel_count": {
+        "n": 120,
+        "p50_ms": 84.678,
+        "p95_ms": 207.055,
+        "p99_ms": 313.401,
+        "min_ms": 28.28,
+        "max_ms": 380.71,
+        "mean_ms": 94.013,
+        "stdev_ms": 61.811,
+        "failures": 0,
+        "cold_first_run_ms": 146.468,
+        "p50_net_of_rtt_ms": 84.377
+      }
+    }
+  },
+  "caveats": []
+}

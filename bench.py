@@ -102,10 +102,29 @@ class Result:
 # constraints) are used deliberately: node ids are already unique by construction
 # in prep_dataset.py, and plain secondary indexes are the one index type every
 # engine in this comparison supports with equivalent semantics.
-DDL = [
-    ("paper_id", "CREATE INDEX paper_id IF NOT EXISTS FOR (p:Paper) ON (p.id)"),
-    ("paper_year", "CREATE INDEX paper_year IF NOT EXISTS FOR (p:Paper) ON (p.year)"),
+# Index DDL is NOT portable across Bolt engines even though the queries are.
+# Neo4j 5 / CognoDB take named indexes; Memgraph only takes the legacy
+# CREATE INDEX ON :Label(prop) form. Same logical indexes either way —
+# one on :Paper(id) for lookups and edge matching, one on :Paper(year) for the
+# filtered lookup — so index parity across platforms is preserved.
+DDL_NEO4J_STYLE = [
+    ("paper_id",
+     "CREATE INDEX paper_id IF NOT EXISTS FOR (p:Paper) ON (p.id)",
+     "DROP INDEX paper_id IF EXISTS"),
+    ("paper_year",
+     "CREATE INDEX paper_year IF NOT EXISTS FOR (p:Paper) ON (p.year)",
+     "DROP INDEX paper_year IF EXISTS"),
 ]
+DDL_MEMGRAPH_STYLE = [
+    ("paper_id", "CREATE INDEX ON :Paper(id)", "DROP INDEX ON :Paper(id)"),
+    ("paper_year", "CREATE INDEX ON :Paper(year)", "DROP INDEX ON :Paper(year)"),
+]
+DDL_BY_PLATFORM = {
+    "cognodb": DDL_NEO4J_STYLE,
+    "neo4j": DDL_NEO4J_STYLE,
+    "aura": DDL_NEO4J_STYLE,
+    "memgraph": DDL_MEMGRAPH_STYLE,
+}
 
 LOAD_NODES = """
 UNWIND $rows AS row
@@ -130,8 +149,13 @@ class BoltAdapter:
 
         self.platform = platform
         self.uri = uri
+        self.ddl = DDL_BY_PLATFORM[platform]
         auth = (user, password) if user else None
-        self._driver = GraphDatabase.driver(uri, auth=auth)
+        # Silence label/reltype-not-found notifications: counts() legitimately runs
+        # against an empty graph before loading, and the warnings drown real output.
+        self._driver = GraphDatabase.driver(
+            uri, auth=auth, warn_notification_severity="OFF"
+        )
 
     def close(self):
         self._driver.close()
@@ -145,11 +169,37 @@ class BoltAdapter:
 
     def timed(self, query, **params):
         """Returns (rows, latency_ms). Latency is client-observed wall clock: it
-        includes network RTT, which is why the client must sit in-region."""
+        includes network RTT, which is why the client must sit in-region.
+
+        Opens a fresh session per call. Thread-safe, so the concurrent mixed
+        workload uses this directly; single-threaded latency runs should use
+        session() below to keep session setup out of the measurement.
+        """
         with self._driver.session() as s:
             t = time.perf_counter()
             rows = [dict(r) for r in s.run(query, **params)]
             return rows, (time.perf_counter() - t) * 1000
+
+    def session(self):
+        """Reusable session for repeated latency measurement.
+
+        Session acquisition is ~free relative to a WAN round trip but is NOT free
+        relative to a 0.4 ms local query, where it would be a large fraction of
+        the reported number. Reusing one session across iterations measures the
+        query rather than the driver. Not thread-safe: one per thread.
+        """
+        driver_session = self._driver.session()
+
+        class _Timed:
+            def timed(_self, query, **params):
+                t = time.perf_counter()
+                rows = [dict(r) for r in driver_session.run(query, **params)]
+                return rows, (time.perf_counter() - t) * 1000
+
+            def close(_self):
+                driver_session.close()
+
+        return _Timed()
 
     # -- lifecycle -----------------------------------------------------------
     def wipe(self):
@@ -161,19 +211,43 @@ class BoltAdapter:
             )
             if not rows or rows[0]["c"] == 0:
                 break
-        for name, _ in DDL:
+        for _, _, drop in self.ddl:
             try:
-                self.run(f"DROP INDEX {name} IF EXISTS")
+                self.run(drop)
             except Exception:
-                pass
+                pass  # index may not exist; wipe must stay idempotent
 
     def create_indexes(self):
         out = {}
-        for name, ddl in DDL:
+        for name, create, _ in self.ddl:
             t = time.perf_counter()
-            self.run(ddl)
+            self.run(create)
             out[name] = round((time.perf_counter() - t) * 1000, 2)
         return out
+
+    def await_indexes(self):
+        """Block until indexes are queryable.
+
+        Returns (confirmed, note). `confirmed` is False only when the platform
+        gives us no way to verify readiness, in which case the caller must record
+        that honestly instead of assuming the index is live. Neo4j exposes
+        db.awaitIndexes; Memgraph builds indexes synchronously; CognoDB offers
+        neither, so it is the only platform that gets the unverifiable caveat.
+        """
+        try:
+            self.run("CALL db.awaitIndexes()")
+            return True, "confirmed via db.awaitIndexes()"
+        except Exception:
+            pass
+        try:
+            # Memgraph: indexes are created synchronously, and SHOW INDEX INFO
+            # listing them is proof they exist rather than merely being queued.
+            rows = self.run("SHOW INDEX INFO")
+            if rows:
+                return True, f"confirmed via SHOW INDEX INFO ({len(rows)} indexes)"
+        except Exception:
+            pass
+        return False, "not verifiable on this platform"
 
     def counts(self):
         n = self.run("MATCH (n:Paper) RETURN count(n) AS c")[0]["c"]

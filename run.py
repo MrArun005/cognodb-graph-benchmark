@@ -20,9 +20,17 @@ load_dotenv()
 
 
 def network_baseline(db, n=100):
-    """No-op query latency = the floor under every other measurement here."""
-    db.timed("RETURN 1 AS n")  # warm the pool
-    lat = [db.timed("RETURN 1 AS n")[1] for _ in range(n)]
+    """No-op query latency = the floor under every other measurement here.
+
+    Measured on a reused session, exactly like the read workloads, so that
+    subtracting this baseline from a workload p50 is apples-to-apples.
+    """
+    s = db.session()
+    try:
+        s.timed("RETURN 1 AS n")  # warm the pool
+        lat = [s.timed("RETURN 1 AS n")[1] for _ in range(n)]
+    finally:
+        s.close()
     return bench.summarise(lat)
 
 
@@ -60,13 +68,21 @@ def cmd_load(args, db):
 
     print("  creating indexes...")
     idx = db.create_indexes()
-    # No db.awaitIndexes() on CognoDB and SHOW INDEXES.state is null, so index
-    # readiness cannot be confirmed. Settle explicitly and record the assumption.
-    time.sleep(args.index_settle)
-    caveats.append(
-        f"Index readiness is not observable on this platform (no db.awaitIndexes, "
-        f"SHOW INDEXES.state is null). Waited {args.index_settle}s after DDL before loading."
-    )
+    confirmed, note = db.await_indexes()
+    if confirmed:
+        print(f"  indexes ready ({note})")
+    else:
+        # Fall back to a fixed settle time and say so, rather than silently
+        # assuming the index is live and reporting index-backed latencies.
+        time.sleep(args.index_settle)
+        caveats.append(
+            f"Index readiness NOT verifiable on this platform ({note}); no "
+            f"db.awaitIndexes and SHOW INDEXES.state is null. Waited "
+            f"{args.index_settle}s after DDL before loading. Load and first-read "
+            f"numbers may include index build cost."
+        )
+        print(f"  indexes NOT confirmable; waited {args.index_settle}s")
+    index_readiness = {"confirmed": confirmed, "method": note}
 
     print("  loading nodes...")
     nodes = db.load_nodes(bench.read_nodes(), args.batch_size)
@@ -104,6 +120,7 @@ def cmd_load(args, db):
             "network_baseline_noop": base,
             "dataset": {k: m[k] for k in ("dataset", "nodes", "relationships")},
             "index_creation_ms": idx,
+            "index_readiness": index_readiness,
             "nodes": nodes,
             "relationships": edges,
             "total_wall_s": round(nodes["wall_s"] + edges["wall_s"], 3),
@@ -133,6 +150,7 @@ def cmd_read(args, db):
     print(f"  network baseline: p50={base['p50_ms']} ms  (subtract to get server time)")
 
     out, cold = {}, {}
+    sess = db.session()
     for name, spec in bench.READ_WORKLOADS.items():
         q = spec[db.dialect]
 
@@ -140,30 +158,34 @@ def cmd_read(args, db):
         # because a single cold sample is not a percentile and must not be pooled
         # with warm measurements.
         try:
-            _, cold_ms = db.timed(q, **_params_for(name, starts, 0))
+            _, cold_ms = sess.timed(q, **_params_for(name, starts, 0))
             cold[name] = round(cold_ms, 3)
         except Exception as e:
             cold[name] = f"FAILED: {type(e).__name__}"
 
         for i in range(args.warmup):
-            db.timed(q, **_params_for(name, starts, i))
+            sess.timed(q, **_params_for(name, starts, i))
 
         lat, failures = [], 0
         for i in range(args.iterations):
             try:
-                _, ms = db.timed(q, **_params_for(name, starts, i))
+                _, ms = sess.timed(q, **_params_for(name, starts, i))
                 lat.append(ms)
             except Exception:
                 failures += 1
 
         s = bench.summarise(lat)
         s["failures"] = failures
-        s["cold_first_run_ms"] = cold[name]
+        # NOT a process cold start: the connection is already established and
+        # earlier workloads have warmed the engine. This is the first execution of
+        # THIS query shape, so it captures query planning/compilation cost only.
+        s["first_exec_of_query_ms"] = cold[name]
         if base["p50_ms"] is not None and s.get("p50_ms") is not None:
             s["p50_net_of_rtt_ms"] = round(s["p50_ms"] - base["p50_ms"], 3)
         out[name] = s
         print(f"    {name:16} p50={s.get('p50_ms')} p95={s.get('p95_ms')} "
               f"cold={cold[name]} fail={failures}")
+    sess.close()
 
     caveats = []
     if base["p50_ms"] and base["p50_ms"] > 20:

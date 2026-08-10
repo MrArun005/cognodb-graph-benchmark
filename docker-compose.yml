@@ -1,0 +1,84 @@
+# Comparator graph databases, every one capped to CognoDB c0's advertised limits:
+#   0.5 vCPU  /  512 MB RAM  /  1 GiB disk
+#
+# Caps are enforced by the container runtime (cpus + mem_limit), NOT by trusting
+# each engine's own config. Engine-level memory settings are additionally tuned
+# below because a JVM or an in-memory store that is unaware of its cgroup limit
+# will simply be OOM-killed rather than degrade gracefully.
+#
+# Run ONE service at a time (`docker compose up neo4j`) so comparators never
+# contend with each other for the host's CPU.
+
+x-caps: &caps
+  cpus: "0.5"
+  mem_limit: 512m
+  mem_reservation: 512m
+  restart: "no"
+
+services:
+  neo4j:
+    <<: *caps
+    image: neo4j:5.26.0-community
+    container_name: bench-neo4j
+    ports: ["7687:7687", "7474:7474"]
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-benchpass123}
+      # Sized to live inside 512 MB: heap + pagecache + JVM overhead must fit.
+      NEO4J_server_memory_heap_initial__size: 200m
+      NEO4J_server_memory_heap_max__size: 200m
+      # Neo4j env mangling: "_" -> "." and "__" -> "_". So pagecache_size (single
+      # underscores) is server.memory.pagecache.size; heap_max__size is heap.max_size.
+      NEO4J_server_memory_pagecache_size: 96m
+      NEO4J_db_memory_transaction_total_max: 128m
+      NEO4J_server_default__listen__address: 0.0.0.0
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  memgraph:
+    <<: *caps
+    image: memgraph/memgraph:2.18.1
+    container_name: bench-memgraph
+    ports: ["7688:7687"]
+    # Memgraph is in-memory: --memory-limit is in MB and must sit below the cgroup
+    # cap or the container is killed instead of the query failing.
+    command:
+      - "--memory-limit=400"
+      - "--bolt-port=7687"
+      - "--log-level=WARNING"
+      - "--telemetry-enabled=false"
+    # No healthcheck: the image ships dash (no /dev/tcp) and carries no curl or
+    # client binary. Readiness is established by the harness's driver-level
+    # verify_connectivity() instead, which is the check that actually matters.
+
+  falkordb:
+    <<: *caps
+    image: falkordb/falkordb:v4.2.2
+    container_name: bench-falkordb
+    ports: ["6379:6379"]
+    # Redis-protocol engine (GraphBLAS). maxmemory keeps it inside the cgroup cap.
+    command: ["redis-server", "--loadmodule", "/var/lib/falkordb/bin/falkordb.so",
+              "--maxmemory", "400mb", "--save", ""]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  arangodb:
+    <<: *caps
+    image: arangodb/arangodb:3.11.8
+    container_name: bench-arangodb
+    ports: ["8529:8529"]
+    environment:
+      ARANGO_ROOT_PASSWORD: ${ARANGO_PASSWORD:-benchpass123}
+    command: ["arangod", "--server.endpoint", "tcp://0.0.0.0:8529",
+              "--rocksdb.total-write-buffer-size", "67108864",
+              "--cache.size", "67108864"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8529/_api/version >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30

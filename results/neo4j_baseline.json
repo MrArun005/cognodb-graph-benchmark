@@ -1,0 +1,23 @@
+{
+  "platform": "neo4j",
+  "phase": "baseline",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T10:23:40Z"
+    },
+    "noop": {
+      "n": 100,
+      "p50_ms": 3.99,
+      "p95_ms": 80.127,
+      "p99_ms": 87.299,
+      "min_ms": 1.766,
+      "max_ms": 87.299,
+      "mean_ms": 15.707,
+      "stdev_ms": 26.764
+    }
+  },
+  "caveats": []
+}

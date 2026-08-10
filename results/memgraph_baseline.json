@@ -1,0 +1,23 @@
+{
+  "platform": "memgraph",
+  "phase": "baseline",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-10T10:23:41Z"
+    },
+    "noop": {
+      "n": 100,
+      "p50_ms": 0.316,
+      "p95_ms": 4.623,
+      "p99_ms": 23.322,
+      "min_ms": 0.236,
+      "max_ms": 23.322,
+      "mean_ms": 1.034,
+      "stdev_ms": 2.8
+    }
+  },
+  "caveats": []
+}
