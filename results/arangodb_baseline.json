@@ -1,0 +1,23 @@
+{
+  "platform": "arangodb",
+  "phase": "baseline",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:22:53Z"
+    },
+    "noop": {
+      "n": 100,
+      "p50_ms": 0.732,
+      "p95_ms": 1.219,
+      "p99_ms": 2.796,
+      "min_ms": 0.568,
+      "max_ms": 2.796,
+      "mean_ms": 0.802,
+      "stdev_ms": 0.276
+    }
+  },
+  "caveats": []
+}

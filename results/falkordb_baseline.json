@@ -1,0 +1,23 @@
+{
+  "platform": "falkordb",
+  "phase": "baseline",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:22:53Z"
+    },
+    "noop": {
+      "n": 100,
+      "p50_ms": 0.241,
+      "p95_ms": 1.572,
+      "p99_ms": 2.526,
+      "min_ms": 0.19,
+      "max_ms": 2.526,
+      "mean_ms": 0.355,
+      "stdev_ms": 0.436
+    }
+  },
+  "caveats": []
+}

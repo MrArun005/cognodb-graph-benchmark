@@ -1,0 +1,131 @@
+{
+  "platform": "memgraph",
+  "phase": "mixed",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:08:43Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 0.285,
+      "p95_ms": 3.967,
+      "p99_ms": 7.221,
+      "min_ms": 0.209,
+      "max_ms": 7.221,
+      "mean_ms": 0.631,
+      "stdev_ms": 1.142
+    },
+    "read_workload": "hop2",
+    "write_ratio": 0.1,
+    "duration_per_level_s": 12.0,
+    "scratch_nodes_removed": 8813,
+    "verified_counts_after": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "levels": {
+      "1": {
+        "clients": 1,
+        "duration_s": 12.0,
+        "reads": 27948,
+        "writes": 3110,
+        "total_ops": 31058,
+        "qps": 2587.5,
+        "read_latency": {
+          "n": 27948,
+          "p50_ms": 0.332,
+          "p95_ms": 0.584,
+          "p99_ms": 1.114,
+          "min_ms": 0.199,
+          "max_ms": 18.931,
+          "mean_ms": 0.375,
+          "stdev_ms": 0.28
+        },
+        "write_latency": {
+          "n": 3110,
+          "p50_ms": 0.303,
+          "p95_ms": 0.548,
+          "p99_ms": 0.981,
+          "min_ms": 0.208,
+          "max_ms": 31.154,
+          "mean_ms": 0.35,
+          "stdev_ms": 0.579
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "10": {
+        "clients": 10,
+        "duration_s": 12.03,
+        "reads": 25564,
+        "writes": 2882,
+        "total_ops": 28446,
+        "qps": 2364.6,
+        "read_latency": {
+          "n": 25564,
+          "p50_ms": 2.17,
+          "p95_ms": 8.113,
+          "p99_ms": 55.671,
+          "min_ms": 0.319,
+          "max_ms": 77.699,
+          "mean_ms": 4.294,
+          "stdev_ms": 9.449
+        },
+        "write_latency": {
+          "n": 2882,
+          "p50_ms": 1.707,
+          "p95_ms": 5.846,
+          "p99_ms": 51.383,
+          "min_ms": 0.302,
+          "max_ms": 73.285,
+          "mean_ms": 3.45,
+          "stdev_ms": 8.272
+        },
+        "errors": 4,
+        "error_samples": [
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You",
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You",
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You"
+        ]
+      },
+      "40": {
+        "clients": 40,
+        "duration_s": 12.08,
+        "reads": 24665,
+        "writes": 2821,
+        "total_ops": 27486,
+        "qps": 2275.1,
+        "read_latency": {
+          "n": 24665,
+          "p50_ms": 9.243,
+          "p95_ms": 66.775,
+          "p99_ms": 85.0,
+          "min_ms": 0.403,
+          "max_ms": 118.807,
+          "mean_ms": 17.603,
+          "stdev_ms": 20.348
+        },
+        "write_latency": {
+          "n": 2821,
+          "p50_ms": 7.636,
+          "p95_ms": 76.618,
+          "p99_ms": 90.835,
+          "min_ms": 0.508,
+          "max_ms": 109.476,
+          "mean_ms": 16.723,
+          "stdev_ms": 22.363
+        },
+        "errors": 10,
+        "error_samples": [
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You",
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You",
+          "TransientError: {neo4j_code: Memgraph.TransientError.MemgraphError.MemgraphError} {message: Cannot resolve conflicting transactions. You"
+        ]
+      }
+    }
+  },
+  "caveats": []
+}

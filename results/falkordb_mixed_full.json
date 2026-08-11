@@ -1,0 +1,127 @@
+{
+  "platform": "falkordb",
+  "phase": "mixed",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:36:22Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 0.234,
+      "p95_ms": 0.769,
+      "p99_ms": 1.007,
+      "min_ms": 0.205,
+      "max_ms": 1.007,
+      "mean_ms": 0.275,
+      "stdev_ms": 0.158
+    },
+    "read_workload": "hop2",
+    "write_ratio": 0.1,
+    "duration_per_level_s": 10.0,
+    "scratch_nodes_removed": 4207,
+    "verified_counts_after": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "levels": {
+      "1": {
+        "clients": 1,
+        "duration_s": 10.0,
+        "reads": 17190,
+        "writes": 1918,
+        "total_ops": 19108,
+        "qps": 1910.3,
+        "read_latency": {
+          "n": 17190,
+          "p50_ms": 0.518,
+          "p95_ms": 0.728,
+          "p99_ms": 0.927,
+          "min_ms": 0.215,
+          "max_ms": 7.347,
+          "mean_ms": 0.525,
+          "stdev_ms": 0.193
+        },
+        "write_latency": {
+          "n": 1918,
+          "p50_ms": 0.484,
+          "p95_ms": 0.559,
+          "p99_ms": 0.661,
+          "min_ms": 0.246,
+          "max_ms": 3.412,
+          "mean_ms": 0.467,
+          "stdev_ms": 0.13
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "10": {
+        "clients": 10,
+        "duration_s": 10.07,
+        "reads": 9107,
+        "writes": 1080,
+        "total_ops": 10187,
+        "qps": 1011.2,
+        "read_latency": {
+          "n": 9107,
+          "p50_ms": 1.69,
+          "p95_ms": 83.196,
+          "p99_ms": 89.414,
+          "min_ms": 0.371,
+          "max_ms": 95.192,
+          "mean_ms": 9.906,
+          "stdev_ms": 24.234
+        },
+        "write_latency": {
+          "n": 1080,
+          "p50_ms": 2.176,
+          "p95_ms": 79.97,
+          "p99_ms": 85.774,
+          "min_ms": 0.603,
+          "max_ms": 94.913,
+          "mean_ms": 9.69,
+          "stdev_ms": 22.76
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "40": {
+        "clients": 40,
+        "duration_s": 30.1,
+        "reads": 9232,
+        "writes": 1209,
+        "total_ops": 10441,
+        "qps": 346.9,
+        "read_latency": {
+          "n": 9232,
+          "p50_ms": 4.25,
+          "p95_ms": 91.599,
+          "p99_ms": 96.421,
+          "min_ms": 0.369,
+          "max_ms": 107.329,
+          "mean_ms": 23.968,
+          "stdev_ms": 35.776
+        },
+        "write_latency": {
+          "n": 1209,
+          "p50_ms": 12.969,
+          "p95_ms": 98.358,
+          "p99_ms": 103.299,
+          "min_ms": 0.889,
+          "max_ms": 175.913,
+          "mean_ms": 42.436,
+          "stdev_ms": 41.167
+        },
+        "errors": 13,
+        "error_samples": [
+          "TimeoutError: Timeout reading from socket",
+          "TimeoutError: Timeout reading from socket",
+          "TimeoutError: Timeout reading from socket"
+        ]
+      }
+    }
+  },
+  "caveats": []
+}

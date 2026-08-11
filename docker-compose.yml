@@ -57,10 +57,11 @@ services:
     <<: *caps
     image: falkordb/falkordb:v4.2.2
     container_name: bench-falkordb
-    ports: ["6379:6379"]
-    # Redis-protocol engine (GraphBLAS). maxmemory keeps it inside the cgroup cap.
-    command: ["redis-server", "--loadmodule", "/var/lib/falkordb/bin/falkordb.so",
-              "--maxmemory", "400mb", "--save", ""]
+    # 6380 on the host: 6379 is commonly already taken by a local Redis.
+    ports: ["6380:6379"]
+    # Redis-protocol engine (GraphBLAS sparse-matrix execution). The image's own
+    # entrypoint loads the module, so it is left alone; the 512 MB cgroup cap above
+    # is what enforces parity, same as every other engine here.
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
       interval: 5s

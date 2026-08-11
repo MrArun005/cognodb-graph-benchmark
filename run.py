@@ -27,8 +27,8 @@ def network_baseline(db, n=100):
     """
     s = db.session()
     try:
-        s.timed("RETURN 1 AS n")  # warm the pool
-        lat = [s.timed("RETURN 1 AS n")[1] for _ in range(n)]
+        s.timed(db.noop)  # warm the pool
+        lat = [s.timed(db.noop)[1] for _ in range(n)]
     finally:
         s.close()
     return bench.summarise(lat)
@@ -219,6 +219,7 @@ def cmd_mixed(args, db):
     starts = bench.start_nodes()
     levels = [int(x) for x in args.concurrency.split(",")]
     read_q = bench.READ_WORKLOADS[args.mixed_read][db.dialect]
+    write_q, cleanup_q = bench.MIXED_BY_DIALECT[db.dialect]
     write_ratio = args.write_ratio
 
     base = network_baseline(db)
@@ -240,7 +241,7 @@ def cmd_mixed(args, db):
                 try:
                     if is_write:
                         _, ms = db.timed(
-                            bench.MIXED_WRITE,
+                            write_q,
                             id=starts[(wid + i) % len(starts)],
                             sid=f"{wid}-{i}",
                         )
@@ -288,7 +289,7 @@ def cmd_mixed(args, db):
     print("  cleaning up scratch writes...")
     removed = 0
     while True:
-        rows = db.run(bench.MIXED_CLEANUP)
+        rows = db.run(cleanup_q)
         c = rows[0]["c"] if rows else 0
         removed += c
         if not c:

@@ -1,0 +1,123 @@
+{
+  "platform": "falkordb",
+  "phase": "load",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:01:25Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 0.234,
+      "p95_ms": 0.479,
+      "p99_ms": 0.962,
+      "min_ms": 0.189,
+      "max_ms": 0.962,
+      "mean_ms": 0.263,
+      "stdev_ms": 0.12
+    },
+    "dataset": {
+      "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "index_creation_ms": {
+      "paper_id": 1.26,
+      "paper_year": 0.31
+    },
+    "index_readiness": {
+      "confirmed": true,
+      "method": "confirmed via db.indexes() (1 indexes)"
+    },
+    "nodes": {
+      "rows": 27769,
+      "wall_s": 0.779,
+      "rows_per_s": 35651.0,
+      "batch_size": 1000,
+      "batches": 28,
+      "batch_latency": {
+        "n": 28,
+        "p50_ms": 16.955,
+        "p95_ms": 62.241,
+        "p99_ms": 66.307,
+        "min_ms": 12.683,
+        "max_ms": 66.307,
+        "mean_ms": 25.058,
+        "stdev_ms": 14.85
+      },
+      "first_10_batches_ms": [
+        22.8,
+        19.6,
+        17.0,
+        62.2,
+        23.3,
+        66.3,
+        24.1,
+        18.3,
+        48.9,
+        14.9
+      ],
+      "last_10_batches_ms": [
+        16.7,
+        16.5,
+        37.0,
+        17.1,
+        16.4,
+        16.4,
+        40.6,
+        17.1,
+        16.7,
+        12.7
+      ]
+    },
+    "relationships": {
+      "rows": 352768,
+      "wall_s": 11.437,
+      "rows_per_s": 30844.8,
+      "batch_size": 1000,
+      "batches": 353,
+      "batch_latency": {
+        "n": 353,
+        "p50_ms": 19.029,
+        "p95_ms": 55.266,
+        "p99_ms": 59.556,
+        "min_ms": 14.968,
+        "max_ms": 101.427,
+        "mean_ms": 28.782,
+        "stdev_ms": 15.308
+      },
+      "first_10_batches_ms": [
+        53.6,
+        19.6,
+        53.8,
+        18.2,
+        25.0,
+        43.6,
+        19.6,
+        17.9,
+        48.0,
+        19.3
+      ],
+      "last_10_batches_ms": [
+        18.3,
+        17.8,
+        45.1,
+        18.6,
+        17.7,
+        17.2,
+        39.6,
+        17.3,
+        17.3,
+        47.4
+      ]
+    },
+    "total_wall_s": 12.216,
+    "verified_counts": {
+      "nodes": 27769,
+      "relationships": 352768
+    }
+  },
+  "caveats": []
+}

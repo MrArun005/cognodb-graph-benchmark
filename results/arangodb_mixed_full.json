@@ -1,0 +1,123 @@
+{
+  "platform": "arangodb",
+  "phase": "mixed",
+  "metrics": {
+    "environment": {
+      "client_host": "Aruns-MacBook-Air.local",
+      "client_platform": "macOS-26.0.1-arm64-arm-64bit",
+      "python": "3.12.4",
+      "utc": "2026-08-11T07:37:02Z"
+    },
+    "network_baseline_noop": {
+      "n": 100,
+      "p50_ms": 0.824,
+      "p95_ms": 1.245,
+      "p99_ms": 1.346,
+      "min_ms": 0.685,
+      "max_ms": 1.346,
+      "mean_ms": 0.866,
+      "stdev_ms": 0.131
+    },
+    "read_workload": "hop2",
+    "write_ratio": 0.1,
+    "duration_per_level_s": 10.0,
+    "scratch_nodes_removed": 1400,
+    "verified_counts_after": {
+      "nodes": 27769,
+      "relationships": 352768
+    },
+    "levels": {
+      "1": {
+        "clients": 1,
+        "duration_s": 10.05,
+        "reads": 1714,
+        "writes": 200,
+        "total_ops": 1914,
+        "qps": 190.5,
+        "read_latency": {
+          "n": 1714,
+          "p50_ms": 2.616,
+          "p95_ms": 6.623,
+          "p99_ms": 35.876,
+          "min_ms": 0.829,
+          "max_ms": 282.949,
+          "mean_ms": 4.055,
+          "stdev_ms": 11.249
+        },
+        "write_latency": {
+          "n": 200,
+          "p50_ms": 5.431,
+          "p95_ms": 57.37,
+          "p99_ms": 176.901,
+          "min_ms": 1.785,
+          "max_ms": 612.201,
+          "mean_ms": 15.411,
+          "stdev_ms": 49.204
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "10": {
+        "clients": 10,
+        "duration_s": 10.31,
+        "reads": 465,
+        "writes": 100,
+        "total_ops": 565,
+        "qps": 54.8,
+        "read_latency": {
+          "n": 465,
+          "p50_ms": 107.428,
+          "p95_ms": 495.898,
+          "p99_ms": 892.311,
+          "min_ms": 1.824,
+          "max_ms": 1294.736,
+          "mean_ms": 183.1,
+          "stdev_ms": 162.038
+        },
+        "write_latency": {
+          "n": 100,
+          "p50_ms": 102.332,
+          "p95_ms": 396.242,
+          "p99_ms": 500.633,
+          "min_ms": 27.878,
+          "max_ms": 500.633,
+          "mean_ms": 165.596,
+          "stdev_ms": 107.197
+        },
+        "errors": 0,
+        "error_samples": []
+      },
+      "40": {
+        "clients": 40,
+        "duration_s": 10.68,
+        "reads": 436,
+        "writes": 400,
+        "total_ops": 836,
+        "qps": 78.3,
+        "read_latency": {
+          "n": 436,
+          "p50_ms": 497.194,
+          "p95_ms": 1289.074,
+          "p99_ms": 1807.887,
+          "min_ms": 6.175,
+          "max_ms": 2421.928,
+          "mean_ms": 585.437,
+          "stdev_ms": 342.934
+        },
+        "write_latency": {
+          "n": 400,
+          "p50_ms": 384.172,
+          "p95_ms": 721.006,
+          "p99_ms": 895.7,
+          "min_ms": 75.571,
+          "max_ms": 1084.12,
+          "mean_ms": 395.549,
+          "stdev_ms": 170.524
+        },
+        "errors": 0,
+        "error_samples": []
+      }
+    }
+  },
+  "caveats": []
+}
