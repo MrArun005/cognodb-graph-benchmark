@@ -5,7 +5,9 @@ resource cap every other platform must be held to.
 
 ## CognoDB Cloud — free tier (c0)
 
-Read from https://console.cognodb.com/instances/<instance-id> on 2026-08-10.
+Read from the CognoDB console instance page (`console.cognodb.com/instances/<instance-id>`)
+on 2026-08-10. The instance id is deliberately omitted: it is the hostname of the
+`bolt+s://` connection URI, and no connection URI belongs in this repository.
 
 | Field | Value |
 |---|---|
