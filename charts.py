@@ -7,6 +7,7 @@ Colour follows the platform, never its rank, so a chart with fewer platforms doe
 not repaint the survivors.
 """
 import json
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -49,16 +50,24 @@ def load(platform, phase, tag="full"):
 
 
 def style(ax, title, subtitle, ylabel):
+    """Title above a wrapped subtitle, with the title's pad derived from the actual
+    wrapped line count — a guessed constant either overlaps or leaves a gap."""
     ax.set_facecolor(SURFACE)
     ax.figure.patch.set_facecolor(SURFACE)
-    ax.set_title(title, color=INK, fontsize=13, fontweight="600", loc="left", pad=22)
-    ax.text(0, 1.02, subtitle, transform=ax.transAxes, color=INK2, fontsize=9.5,
-            va="bottom", ha="left")
+
+    # Wrap first: an unwrapped long subtitle stretches the figure via
+    # bbox_inches="tight", which silently wrecks the aspect ratio.
+    lines = textwrap.wrap(subtitle, width=96)
+    ax.text(0, 1.015, "\n".join(lines), transform=ax.transAxes, color=INK2,
+            fontsize=9.5, va="bottom", ha="left", linespacing=1.45)
+    ax.set_title(title, color=INK, fontsize=13, fontweight="600", loc="left",
+                 pad=14 + 14 * len(lines))
+
     ax.set_ylabel(ylabel, color=INK2, fontsize=9.5)
     ax.grid(axis="y", color=GRID, linewidth=0.8)
     ax.set_axisbelow(True)
-    for s in ("top", "right", "left"):
-        ax.spines[s].set_visible(False)
+    for sp in ("top", "right", "left"):
+        ax.spines[sp].set_visible(False)
     ax.spines["bottom"].set_color(GRID)
     ax.tick_params(colors=INK2, labelsize=9, length=0)
     ax.tick_params(axis="both", which="minor", length=0)
@@ -97,9 +106,19 @@ def chart_ingest():
 
 
 def chart_traversal():
+    """Traversal comparison, deliberately EXCLUDING CognoDB.
+
+    Its raw traversal latency is ~99.9% network round trip (see README §7.1), so
+    plotting it beside localhost engines would imply it is ~700x slower — a claim
+    the data cannot support in either direction. The raw numbers stay in
+    docs/RESULTS.md where the caveat sits next to them. Refusing to draw a
+    misleading comparison is not the same as hiding it.
+    """
     hops = ["hop1", "hop2", "hop3"]
     series = {}
     for p in ORDER:
+        if p == "cognodb":
+            continue
         d = load(p, "read")
         if not d:
             continue
@@ -108,7 +127,7 @@ def chart_traversal():
             series[p] = vals
     if not series:
         return
-    fig, ax = plt.subplots(figsize=(8.6, 4.4))
+    fig, ax = plt.subplots(figsize=(8.6, 4.6))
     n = len(series)
     w = 0.8 / n
     for i, (p, vals) in enumerate(series.items()):
@@ -122,10 +141,15 @@ def chart_traversal():
     ax.set_xticklabels(["1 hop", "2 hops", "3 hops"], fontsize=10)
     ax.set_yscale("log")
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}"))
-    style(ax, "Traversal latency by hop depth (p50)",
-          "120 iterations after 20 warm-up, same 200 start nodes on every platform. "
-          "Log scale. Lower is better.", "p50 latency, ms (log)")
-    leg = ax.legend(frameon=False, fontsize=9, ncol=3, loc="upper left")
+    ax.set_ylim(top=max(max(v) for v in series.values()) * 4.5)
+    style(ax, "Traversal latency by hop depth (p50) — self-hosted engines",
+          "120 iterations after 20 warm-up, same 200 start nodes everywhere. Log "
+          "scale, lower is better. CognoDB is excluded: its traversal latency is "
+          "~99.9% network round trip (see README \u00a77.1), so a side-by-side bar "
+          "would assert a difference the data cannot support. Raw values are in "
+          "docs/RESULTS.md.", "p50 latency, ms (log)")
+    leg = ax.legend(frameon=False, fontsize=9, ncol=4, loc="upper center",
+                    bbox_to_anchor=(0.5, 1.0))
     for t in leg.get_texts():
         t.set_color(INK2)
     save(fig, "traversal_scaling.png")
@@ -136,6 +160,11 @@ def chart_tails():
     explains why a p50-only comparison would mislead."""
     rows = []
     for p in ORDER:
+        # CognoDB excluded: both its p50 and p95 are dominated by a constant ~255 ms
+        # round trip, so the RATIO collapses toward 1.0 and would advertise
+        # excellent tail behaviour that this setup cannot observe either way.
+        if p == "cognodb":
+            continue
         d = load(p, "read")
         if not d:
             continue
@@ -169,9 +198,11 @@ def chart_tails():
     ax.yaxis.set_minor_formatter(FuncFormatter(lambda x, _: ""))
     ax.tick_params(axis="y", which="minor", length=0)
     ax.set_ylim(top=top * 4.5)
-    style(ax, "Median vs tail latency — 1-hop traversal",
+    style(ax, "Median vs tail latency — 1-hop traversal, self-hosted engines",
           "Solid = p50, hatched = p95. The multiplier is p95/p50: how much worse "
-          "the tail is than the median. Log scale.", "latency, ms (log)")
+          "the tail is than the median. Log scale. CognoDB excluded \u2014 a constant "
+          "255 ms round trip flattens its ratio toward 1.0 regardless of engine "
+          "behaviour.", "latency, ms (log)")
     save(fig, "tail_latency.png")
 
 

@@ -75,35 +75,46 @@ Here is the table everyone wants:
 |---|---|---|---|---|
 | 1-hop p50 | 1.49 ms | 0.36 ms | **0.33 ms** | 0.84 ms |
 | 3-hop p50 | 3.89 ms | 1.28 ms | **0.87 ms** | 13.50 ms |
-| Ingest (rels/s) | 7,334 | **73,460** | 30,845 | 6,210 |
+| Ingest (rels/s) | 12,154 | **96,325** | 30,845 | 6,210 |
 
 And here is the table that actually explains it:
 
-| | Memory used | % of its 512 MB cap |
-|---|---|---|
-| Neo4j | 433 MiB | **85%** |
-| ArangoDB | 379 MiB | 74% |
-| Memgraph | 143 MiB | 28% |
-| FalkorDB | 140 MiB | 27% |
+| | Memory used | % of cap | median p95/p50 | worst p95/p50 |
+|---|---|---|---|---|
+| Neo4j | 503 MiB | **98%** | **3.6×** | 31.5× |
+| ArangoDB | 383 MiB | 75% | 2.5× | 11.6× |
+| Memgraph | 144 MiB | 28% | 1.5× | 6.0× |
+| FalkorDB | 128 MiB | 25% | **1.3×** | 12.3× |
 
-Neo4j's median latency is fine. Its **p95 is roughly fifty times its p50.**
+Read the memory column, then the tail column. They are in the same order.
 
-That is not an engine being slow. That is an engine being *strangled*. A JVM
-running at 85% of its ceiling garbage-collects constantly, and every collection
-lands on some unlucky query's tail. The two engines with the most headroom have
-the tightest tails — FalkorDB's p95 sits about 1.2× its p50, which is
-extraordinarily flat.
+That is not an engine being slow. That is an engine being *strangled*. A JVM at
+98% of its ceiling garbage-collects constantly, and every collection lands on some
+unlucky query.
 
-Look at the very first write batch of the load, too:
+Here is where I have to correct myself in public. My first run measured Neo4j's
+1-hop p95 at **52×** its median, and I wrote a confident paragraph about it. Then I
+re-ran the whole thing. 1-hop came back at 2.3× — and 3-hop spiked to 31× instead.
+The pauses are real and they are big. But *which query gets hit is random*, which
+is exactly what you'd expect from garbage collection and exactly what a
+single-workload headline number hides. One sample is an anecdote, even when it's
+your own.
+
+Look at the very first write batches of the load, too:
 
 ```
-Neo4j, first 3 batches:  3679.1 ms   598.6 ms   1702.4 ms
-Neo4j, last 3 batches:      99.1 ms   102.5 ms     97.1 ms
+Neo4j, first 4 batches:  774.4 ms   195.9 ms   104.8 ms   492.8 ms
+Neo4j, last 3 batches:    14.8 ms    15.5 ms    14.3 ms
 ```
 
-A 3.7-second first batch, settling to 97 ms. If you had benchmarked Neo4j with a
-small dataset, you'd have measured almost nothing but JVM warm-up and concluded
-something wildly untrue.
+A 774 ms first batch settling to 15 ms — a 52× warm-up ramp. If you had
+benchmarked Neo4j with a small dataset, you'd have measured mostly JVM warm-up
+and concluded something wildly untrue.
+
+And here is the uncomfortable part. I ran that same load twice. The first time
+Neo4j managed 7,334 rels/s; the second, 12,154. Memgraph went from 73,460 to
+96,325. Same hardware, same data, same code — swings of 66% and 31%. Any ranking
+that depends on differences smaller than that is noise wearing a table.
 
 **The lesson isn't "Neo4j is bad."** Give it 4 GB and this inverts. The lesson is
 that on a small tier, *the binding constraint is memory headroom, not engine
@@ -167,14 +178,14 @@ MATCH (:Paper)-[:CITES]->(:Paper) RETURN count(*)
 RETURN COUNT(FOR e IN cites RETURN 1)
 ```
 
-ArangoDB: **17 ms**. The Cypher engines: 85–191 ms. CognoDB: ~1,520 ms.
+ArangoDB: **17 ms**. The Cypher engines: 85–185 ms. CognoDB: ~1,613 ms.
 
 Same question. Completely different amount of work. ArangoDB didn't win that row;
 it answered a different row. It's flagged `not_comparable` in the code itself, so
 nobody can quote it innocently.
 
 I'll admit a wrong prediction here too. Before running it, I said Neo4j would
-answer that query from its count-store in about a millisecond. It took 191 ms —
+answer that query from its count-store in about a millisecond. It took 185 ms —
 the count-store only applies to *unlabelled* patterns, and I'd put labels on both
 ends. I was confidently wrong and the measurement corrected me. That is what
 measurements are for, and pretending otherwise is how benchmarks become marketing.
@@ -191,7 +202,7 @@ I published would be fiction with error bars.
 
 What I *can* say, because it clears the noise floor by an order of magnitude:
 
-- Its full relationship count takes ~1,520 ms of server-side time, against 17–191
+- Its full relationship count takes ~1,613 ms of server-side time, against 17–185
   ms for the self-hosted engines. No count-store-style shortcut.
 - Corrected for round trip, its ingest implies ~30,000 rels/s of real capability —
   which would put it between FalkorDB and Memgraph. That's an inference, not a
@@ -216,7 +227,7 @@ The fix for the gap is one environment variable and one re-run from a VM in
    bigger than the thing you're timing, stop and move the client.
 2. **Publish p95, not just p50.** The median is the number that flatters you. The
    tail is the number your users experience.
-3. **Check the resource ceiling before blaming the engine.** 85% heap utilisation
+3. **Check the resource ceiling before blaming the engine.** 98% heap utilisation
    explained more of my results than any architectural difference did.
 4. **Never let a "same query" claim go unexamined across query languages.**
    Equivalent syntax is not equivalent cost.

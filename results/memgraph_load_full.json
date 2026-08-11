@@ -6,17 +6,17 @@
       "client_host": "Aruns-MacBook-Air.local",
       "client_platform": "macOS-26.0.1-arm64-arm-64bit",
       "python": "3.12.4",
-      "utc": "2026-08-10T10:26:16Z"
+      "utc": "2026-08-11T07:52:34Z"
     },
     "network_baseline_noop": {
       "n": 100,
-      "p50_ms": 0.315,
-      "p95_ms": 0.694,
-      "p99_ms": 1.176,
-      "min_ms": 0.255,
-      "max_ms": 1.176,
-      "mean_ms": 0.356,
-      "stdev_ms": 0.152
+      "p50_ms": 0.44,
+      "p95_ms": 1.027,
+      "p99_ms": 2.491,
+      "min_ms": 0.272,
+      "max_ms": 2.491,
+      "mean_ms": 0.491,
+      "stdev_ms": 0.294
     },
     "dataset": {
       "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
@@ -24,98 +24,100 @@
       "relationships": 352768
     },
     "index_creation_ms": {
-      "paper_id": 6.24,
-      "paper_year": 0.84
+      "paper_id": 2.0,
+      "paper_year": 0.57
+    },
+    "index_readiness": {
+      "confirmed": true,
+      "method": "confirmed via SHOW INDEX INFO (2 indexes)"
     },
     "nodes": {
       "rows": 27769,
-      "wall_s": 0.84,
-      "rows_per_s": 33046.3,
+      "wall_s": 0.538,
+      "rows_per_s": 51620.5,
       "batch_size": 1000,
       "batches": 28,
       "batch_latency": {
         "n": 28,
-        "p50_ms": 19.213,
-        "p95_ms": 91.375,
-        "p99_ms": 94.45,
-        "min_ms": 11.819,
-        "max_ms": 94.45,
-        "mean_ms": 28.764,
-        "stdev_ms": 22.094
+        "p50_ms": 12.769,
+        "p95_ms": 39.274,
+        "p99_ms": 80.622,
+        "min_ms": 8.774,
+        "max_ms": 80.622,
+        "mean_ms": 17.691,
+        "stdev_ms": 14.429
       },
       "first_10_batches_ms": [
-        46.0,
-        35.6,
-        24.6,
-        56.6,
-        16.2,
-        17.0,
-        46.9,
-        14.9,
-        94.5,
-        14.6
+        28.4,
+        35.4,
+        39.3,
+        15.1,
+        12.1,
+        13.4,
+        15.7,
+        17.7,
+        9.6,
+        11.3
       ],
       "last_10_batches_ms": [
-        20.5,
-        16.0,
-        91.4,
-        19.2,
-        48.8,
-        15.5,
-        22.8,
-        11.8,
+        12.4,
+        10.4,
+        12.5,
+        12.8,
+        11.0,
+        11.3,
+        10.7,
+        13.2,
         12.7,
-        16.0
+        8.8
       ]
     },
     "relationships": {
       "rows": 352768,
-      "wall_s": 4.802,
-      "rows_per_s": 73460.2,
+      "wall_s": 3.662,
+      "rows_per_s": 96324.6,
       "batch_size": 1000,
       "batches": 353,
       "batch_latency": {
         "n": 353,
-        "p50_ms": 9.983,
-        "p95_ms": 17.663,
-        "p99_ms": 25.288,
-        "min_ms": 8.337,
-        "max_ms": 483.323,
-        "mean_ms": 12.641,
-        "stdev_ms": 25.459
+        "p50_ms": 8.94,
+        "p95_ms": 11.847,
+        "p99_ms": 17.507,
+        "min_ms": 7.981,
+        "max_ms": 78.378,
+        "mean_ms": 9.484,
+        "stdev_ms": 3.986
       },
       "first_10_batches_ms": [
-        15.5,
-        14.4,
-        10.0,
-        13.6,
-        8.9,
-        10.9,
-        9.5,
+        11.0,
+        9.1,
+        10.1,
         8.7,
-        10.8,
-        11.0
+        8.9,
+        10.7,
+        8.9,
+        8.4,
+        22.7,
+        9.1
       ],
       "last_10_batches_ms": [
-        9.0,
-        9.2,
-        9.1,
+        8.8,
+        8.3,
         8.9,
-        11.2,
-        10.3,
-        9.6,
-        10.3,
-        11.2,
-        8.4
+        8.6,
+        8.2,
+        8.9,
+        8.6,
+        78.4,
+        10.6,
+        23.7
       ]
     },
-    "total_wall_s": 5.642,
+    "total_wall_s": 4.2,
     "verified_counts": {
       "nodes": 27769,
       "relationships": 352768
     }
   },
-  "caveats": [
-    "Index readiness is not observable on this platform (no db.awaitIndexes, SHOW INDEXES.state is null). Waited 3.0s after DDL before loading."
-  ]
+  "caveats": []
 }

@@ -6,17 +6,17 @@
       "client_host": "Aruns-MacBook-Air.local",
       "client_platform": "macOS-26.0.1-arm64-arm-64bit",
       "python": "3.12.4",
-      "utc": "2026-08-10T10:23:41Z"
+      "utc": "2026-08-11T07:52:16Z"
     },
     "noop": {
       "n": 100,
-      "p50_ms": 0.316,
-      "p95_ms": 4.623,
-      "p99_ms": 23.322,
-      "min_ms": 0.236,
-      "max_ms": 23.322,
-      "mean_ms": 1.034,
-      "stdev_ms": 2.8
+      "p50_ms": 0.3,
+      "p95_ms": 0.443,
+      "p99_ms": 0.663,
+      "min_ms": 0.211,
+      "max_ms": 0.663,
+      "mean_ms": 0.312,
+      "stdev_ms": 0.068
     }
   },
   "caveats": []

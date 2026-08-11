@@ -204,11 +204,24 @@ class BoltAdapter:
 
     # -- lifecycle -----------------------------------------------------------
     def wipe(self):
-        """Delete all data. Batched, because a single DETACH DELETE of 350k
-        relationships will exhaust 512 MB of heap."""
+        """Delete all data, relationships first, in small batches.
+
+        DETACH DELETE on a node drags every attached relationship into the same
+        transaction, so batching by NODE is misleading: 5,000 nodes can pull in
+        hundreds of thousands of relationships and blow
+        db.memory.transaction.total.max (128 MiB here) even though the node batch
+        looks modest. Deleting relationships first, in their own small batches,
+        keeps every transaction bounded regardless of graph density.
+        """
         while True:
             rows = self.run(
-                "MATCH (n) WITH n LIMIT 5000 DETACH DELETE n RETURN count(*) AS c"
+                "MATCH ()-[r]->() WITH r LIMIT 10000 DELETE r RETURN count(*) AS c"
+            )
+            if not rows or rows[0]["c"] == 0:
+                break
+        while True:
+            rows = self.run(
+                "MATCH (n) WITH n LIMIT 10000 DELETE n RETURN count(*) AS c"
             )
             if not rows or rows[0]["c"] == 0:
                 break

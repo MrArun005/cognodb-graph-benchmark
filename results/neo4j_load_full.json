@@ -6,17 +6,17 @@
       "client_host": "Aruns-MacBook-Air.local",
       "client_platform": "macOS-26.0.1-arm64-arm-64bit",
       "python": "3.12.4",
-      "utc": "2026-08-10T10:25:50Z"
+      "utc": "2026-08-11T07:54:52Z"
     },
     "network_baseline_noop": {
       "n": 100,
-      "p50_ms": 3.254,
-      "p95_ms": 84.686,
-      "p99_ms": 93.955,
-      "min_ms": 1.496,
-      "max_ms": 93.955,
-      "mean_ms": 14.679,
-      "stdev_ms": 27.414
+      "p50_ms": 1.012,
+      "p95_ms": 4.228,
+      "p99_ms": 75.404,
+      "min_ms": 0.694,
+      "max_ms": 75.404,
+      "mean_ms": 3.32,
+      "stdev_ms": 12.372
     },
     "dataset": {
       "dataset": "SNAP cit-HepTh (Arxiv HEP-TH paper citation network)",
@@ -24,98 +24,100 @@
       "relationships": 352768
     },
     "index_creation_ms": {
-      "paper_id": 1025.91,
-      "paper_year": 169.43
+      "paper_id": 53.82,
+      "paper_year": 5.45
+    },
+    "index_readiness": {
+      "confirmed": true,
+      "method": "confirmed via db.awaitIndexes()"
     },
     "nodes": {
       "rows": 27769,
-      "wall_s": 13.111,
-      "rows_per_s": 2117.9,
+      "wall_s": 6.985,
+      "rows_per_s": 3975.8,
       "batch_size": 1000,
       "batches": 28,
       "batch_latency": {
         "n": 28,
-        "p50_ms": 284.756,
-        "p95_ms": 694.878,
-        "p99_ms": 5301.546,
-        "min_ms": 114.829,
-        "max_ms": 5301.546,
-        "mean_ms": 466.38,
-        "stdev_ms": 958.868
+        "p50_ms": 109.74,
+        "p95_ms": 1090.579,
+        "p99_ms": 1192.581,
+        "min_ms": 21.105,
+        "max_ms": 1192.581,
+        "mean_ms": 245.025,
+        "stdev_ms": 281.941
       },
       "first_10_batches_ms": [
-        5301.5,
-        596.6,
-        297.8,
-        303.9,
-        694.9,
-        683.4,
-        292.5,
-        302.2,
-        304.6,
-        186.4
+        465.0,
+        295.1,
+        1192.6,
+        1090.6,
+        469.9,
+        196.5,
+        206.2,
+        295.9,
+        413.7,
+        83.7
       ],
       "last_10_batches_ms": [
-        193.3,
-        119.7,
-        192.7,
-        196.3,
-        191.9,
-        205.7,
-        287.5,
-        114.8,
-        390.4,
-        204.6
+        197.4,
+        109.7,
+        315.7,
+        151.8,
+        107.5,
+        89.3,
+        223.5,
+        74.9,
+        90.1,
+        21.1
       ]
     },
     "relationships": {
       "rows": 352768,
-      "wall_s": 48.099,
-      "rows_per_s": 7334.3,
+      "wall_s": 29.026,
+      "rows_per_s": 12153.6,
       "batch_size": 1000,
       "batches": 353,
       "batch_latency": {
         "n": 353,
-        "p50_ms": 93.888,
-        "p95_ms": 386.897,
-        "p99_ms": 916.41,
-        "min_ms": 16.311,
-        "max_ms": 3679.125,
-        "mean_ms": 134.559,
-        "stdev_ms": 241.882
+        "p50_ms": 43.856,
+        "p95_ms": 272.202,
+        "p99_ms": 421.123,
+        "min_ms": 13.916,
+        "max_ms": 774.443,
+        "mean_ms": 79.739,
+        "stdev_ms": 91.149
       },
       "first_10_batches_ms": [
-        3679.1,
-        598.6,
-        1702.4,
-        399.8,
-        595.8,
-        305.5,
-        291.2,
-        295.3,
-        304.8,
-        397.9
+        774.4,
+        195.9,
+        104.8,
+        492.8,
+        305.3,
+        300.2,
+        195.1,
+        281.5,
+        101.6,
+        107.9
       ],
       "last_10_batches_ms": [
-        24.7,
-        56.5,
-        20.5,
-        28.8,
-        60.6,
-        99.6,
-        94.0,
-        99.1,
-        102.5,
-        97.1
+        16.9,
+        15.4,
+        74.4,
+        22.6,
+        17.0,
+        16.2,
+        16.3,
+        14.8,
+        15.5,
+        14.3
       ]
     },
-    "total_wall_s": 61.21,
+    "total_wall_s": 36.011,
     "verified_counts": {
       "nodes": 27769,
       "relationships": 352768
     }
   },
-  "caveats": [
-    "Index readiness is not observable on this platform (no db.awaitIndexes, SHOW INDEXES.state is null). Waited 3.0s after DDL before loading."
-  ]
+  "caveats": []
 }

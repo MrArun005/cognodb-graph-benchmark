@@ -6,11 +6,13 @@ same dataset, with the same logical queries.
 
 > **The single most important finding is a methodological one, and it is not
 > flattering to the benchmark itself:** measured from a laptop in Bengaluru, a
-> 2-hop traversal against CognoDB in Virginia appeared *faster* than a 1-hop
-> traversal. That is physically impossible. It happens because the 243 ms network
-> round trip is 40× larger than the 1–6 ms of actual database work, so the
-> measurement is pure noise. Read [§7 Caveats](#7-caveats--what-this-benchmark-cannot-tell-you)
-> before you trust a single latency number for CognoDB.
+> 1-hop and a 2-hop traversal against CognoDB in Virginia came out **0.5 ms
+> apart** (245.98 ms vs 246.50 ms) — and in an earlier probe the 2-hop measured
+> *faster* than the 1-hop, which is physically impossible. A 2-hop traversal
+> visits everything a 1-hop does and then keeps going. The ~250 ms network round
+> trip is two orders of magnitude larger than the real work, so the measurement
+> is noise. Read [§7 Caveats](#7-caveats--what-this-benchmark-cannot-tell-you)
+> before you trust a single traversal latency for CognoDB.
 
 ---
 
@@ -30,6 +32,44 @@ Full numbers: **[docs/RESULTS.md](docs/RESULTS.md)** — generated from raw JSON
 
 Advertised platform specs and the CognoDB capability probe:
 **[docs/PLATFORM_SPECS.md](docs/PLATFORM_SPECS.md)**.
+
+A narrative write-up aimed at a general technical audience:
+**[ARTICLE.md](ARTICLE.md)**.
+
+### At a glance
+
+![Ingest throughput](docs/charts/ingest_throughput.png)
+
+![Traversal latency by hop depth](docs/charts/traversal_scaling.png)
+
+**Why CognoDB is absent from the two latency charts.** Its raw traversal p50 is
+254.85 ms against a 254.81 ms no-op baseline — 99.98% of that number is the round
+trip. Drawing it beside a localhost engine would assert "700× slower", which is
+false; excluding it from the p95/p50 chart likewise avoids advertising a 1.3× tail
+ratio that only reflects constant network latency. **The raw values are all present
+in [docs/RESULTS.md](docs/RESULTS.md)**, next to the caveat. Declining to draw a
+comparison the data cannot support is not the same as hiding it.
+
+The chart below is worth dwelling on: Neo4j's *median* is competitive while its
+tail is not. Note that the specific workload carrying the spike moves between runs
+(see [§6.1](#61-memory-headroom-not-engine-design-predicts-tail-latency)) — the
+chart shows one run, and the ratio column in §6.1 is the aggregate view.
+
+![Median vs tail latency](docs/charts/tail_latency.png)
+
+![Memory headroom](docs/charts/memory_headroom.png)
+
+Two different phenomena share the next chart. Every self-hosted engine is flat or
+falling — 0.5 vCPU is saturated by the first client. CognoDB climbs steeply, which
+looks like excellent scaling and is actually 243 ms of per-client network dead air
+being filled in. See [§7.1](#71-cognodb-was-measured-across-a-wan-the-comparators-were-not-️).
+
+![Concurrency sweep](docs/charts/concurrency_sweep.png)
+
+Charts are regenerated from raw JSON by `charts.py`. The categorical palette is
+validated for colour-vision deficiency (worst adjacent-pair CVD ΔE 9.1,
+normal-vision ΔE 19.6); every mark carries a value label so identity and magnitude
+never depend on colour alone.
 
 ---
 
@@ -171,26 +211,36 @@ appears anywhere in this repository.
 See [docs/RESULTS.md](docs/RESULTS.md) for the full matrix. The findings that
 survive scrutiny:
 
-### 6.1 Memory headroom, not engine design, dominates at 512 MB
+### 6.1 Memory headroom, not engine design, predicts tail latency
 
-The footprint table is the key to the whole benchmark:
+The footprint table is the key to the whole benchmark. `p95/p50` is reported two
+ways deliberately: the **median** ratio across the seven read workloads (typical
+tail behaviour) and the **worst** single workload (how bad it gets).
 
-| Platform | Memory used | % of 512 MB cap | p95 / p50 ratio (1-hop) |
-|---|---|---|---|
-| Neo4j | 433 MiB | **85%** | **~52×** |
-| ArangoDB | 379 MiB | 74% | ~1.5× |
-| Memgraph | 143 MiB | 28% | ~3× |
-| FalkorDB | 140 MiB | 27% | **~1.2×** |
+| Platform | Memory used | % of 512 MB cap | median p95/p50 | worst p95/p50 |
+|---|---|---|---|---|
+| Neo4j | 503 MiB | **98%** | **3.6×** | **31.5×** (3-hop) |
+| ArangoDB | 383 MiB | 75% | 2.5× | 11.6× (3-hop) |
+| Memgraph | 144 MiB | 28% | 1.5× | 6.0× (3-hop) |
+| FalkorDB | 128 MiB | 25% | **1.3×** | 12.3× (group-by) |
 
-Neo4j's p95 is roughly 50× its p50 while its median latency is perfectly
-respectable. That is not slowness, it is **variance** — and it lines up exactly
-with the JVM running at 85% of its cap. A 200 MB heap holding this graph plus
-query state collects constantly, and every collection lands on some unlucky
-query's tail. The two engines with the most headroom have the tightest tails.
+The ordering of the median-ratio column is exactly the ordering of the memory
+column. Neo4j runs at 98% of its cap and has both the worst typical tail and the
+worst spike; FalkorDB at 25% is nearly flat. A 200 MB heap holding this graph plus
+query state collects constantly, and each collection lands on some unlucky query.
 
-**This is the practical lesson of the whole exercise: on a small tier, pick the
-engine whose memory model fits the box, not the one with the best median.** A p50
-you can quote and a p95 your users actually feel are different numbers.
+**An important correction to an earlier version of this analysis.** I first
+measured Neo4j's 1-hop p95 at 52× its p50 and wrote that up as "Neo4j's p95 is ~50×
+its median". A repeat run did not reproduce it: 1-hop came back at 2.3×, while
+3-hop hit 31.5× and group-by 16.7×. **The spikes are real, large, and consistent
+in aggregate — but which workload absorbs them varies between runs.** That is
+itself the signature of GC pauses landing stochastically rather than a specific
+query being slow. Quoting a single workload's ratio was over-claiming from one
+sample; the two-column table above is what the data actually supports.
+
+**The practical lesson: on a small tier, pick the engine whose memory model fits
+the box, not the one with the best median.** A p50 you can quote and a p95 your
+users feel are different numbers — and a p95 measured once is not a p95.
 
 ### 6.2 A 0.5 vCPU cap makes concurrency scaling almost meaningless
 
@@ -208,7 +258,7 @@ more than they measure server capacity. Worth running; not worth over-reading.
 `agg_rel_count` is the clearest case. In Cypher, `MATCH (:Paper)-[:CITES]->(:Paper)
 RETURN count(*)` constrains the label at both endpoints and forces a real scan of
 every relationship. The natural AQL equivalent can be answered from collection
-metadata. ArangoDB returns it in ~17 ms against 85–191 ms for the Cypher engines —
+metadata. ArangoDB returns it in ~17 ms against 85–185 ms for the Cypher engines —
 and that gap is a *query planning* difference, not a throughput difference.
 
 This is flagged in the code itself (`not_comparable` on the workload definition)
@@ -217,7 +267,7 @@ ArangoDB was worth the cost of a second adapter: without a non-Cypher engine in
 the panel, this class of artefact is invisible.
 
 I also predicted, before measuring, that Neo4j would answer this query from its
-count-store in ~1 ms. It took 191 ms — the count-store only applies to
+count-store in ~1 ms. It took 185 ms — the count-store only applies to
 unlabelled patterns. **The prediction was wrong and the measurement corrected
 it**, which is the entire reason for measuring.
 
@@ -225,8 +275,8 @@ it**, which is the entire reason for measuring.
 
 What can be said with confidence, because it sits far above the noise floor:
 
-- CognoDB's `agg_rel_count` costs **~1,520 ms of server-side time** against 85 ms
-  (Memgraph), 85 ms (FalkorDB), 191 ms (Neo4j) and 17 ms (ArangoDB). Even with a
+- CognoDB's `agg_rel_count` costs **~1,613 ms of server-side time** against 85 ms
+  (Memgraph), 85 ms (FalkorDB), 185 ms (Neo4j) and 17 ms (ArangoDB). Even with a
   243 ms round trip subtracted and generous error bars, this is roughly an order
   of magnitude slower than the self-hosted engines. It has no count-store-style
   shortcut and no obvious scan optimisation.
@@ -290,7 +340,7 @@ zero-cost account was available before the deadline.
 
 Mitigation, and its limits: every phase records its own no-op baseline on a
 reused session, and `p50_net_of_rtt_ms` is reported for every workload. This works
-for CognoDB's aggregation numbers, where server-side cost (~1,520 ms) dwarfs both
+for CognoDB's aggregation numbers, where server-side cost (~1,613 ms) dwarfs both
 the round trip and its jitter. It **does not** work for traversals and lookups,
 where 1–6 ms of server work is buried under ~15 ms of jitter. The harness detects
 this itself and stamps `MEASUREMENT INVALID FOR PUBLICATION` into the result JSON
@@ -318,12 +368,27 @@ the engine, `first_exec_of_query_ms` captures query planning only. True
 process-cold-start numbers would require restarting each engine between
 measurements and were not collected. The column is named to prevent overclaiming.
 
-### 7.5 Single run per configuration
-Numbers are one run of 120 iterations per workload, not a distribution over
-repeated runs. Neo4j's own baseline moved from 1.6 ms to 5.6 ms between two
-consecutive runs, which is direct evidence that run-to-run variance here is
-non-trivial. **Ranking platforms whose medians differ by less than ~2× is not
-supported by this data.**
+### 7.5 Single run per configuration — with measured evidence of why that matters
+Reported numbers are one run per configuration, not a distribution over repeated
+runs. Where a configuration *was* run twice, the spread was large:
+
+| Measurement | Run 1 | Run 2 | Spread |
+|---|---|---|---|
+| Neo4j ingest (rels/s) | 7,334 | 12,154 | **+66%** |
+| Memgraph ingest (rels/s) | 73,460 | 96,325 | **+31%** |
+| Neo4j no-op baseline (ms) | 1.60 | 5.58 | **3.5×** |
+| Neo4j 1-hop p95/p50 | 52× | 2.3× | **23×** |
+
+Same hardware, same dataset, same code. The tables report the second (current)
+run; the first is preserved here rather than discarded. Contributing factors: JVM
+warm-up state, container uptime, and host cache state — the second Neo4j load ran
+against a container that had been up 22 hours.
+
+**Consequence: do not rank platforms whose numbers differ by less than ~2×.**
+Memgraph vs FalkorDB on ingest (96k vs 31k) is outside that band. Neo4j vs
+ArangoDB on ingest (12.2k vs 6.2k) is marginal. A proper treatment needs n≥5 runs
+per configuration with confidence intervals; that is the first thing I would add
+with more time.
 
 ### 7.6 CognoDB memory is not observable
 No host access and no `dbms.*` memory procedure. The console exposes node,
@@ -364,14 +429,15 @@ assumed, and they are how anyone would verify the §6.5 claims independently.
 
 At 512 MB and half a core, on this dataset:
 
-- **Memgraph** is the fastest all-rounder — best ingest (73k rels/s), best
+- **Memgraph** is the fastest all-rounder — best ingest (96k rels/s), best
   traversal medians, most throughput, and it fits in 28% of the cap.
 - **FalkorDB** has the best *predictability* — p95 barely above p50 — at the cost
   of near-zero durable footprint by design.
 - **ArangoDB** is competitive but its planner makes some comparisons meaningless
   in either direction; read the per-workload notes before quoting it.
-- **Neo4j** has fine medians and the worst tails in the group, driven by heap
-  pressure rather than engine design. Give it more memory and this likely inverts.
+- **Neo4j** has fine medians and the worst tails in the group (median p95/p50
+  3.6×, worst 31.5×), driven by running at 98% of its memory cap rather than by
+  engine design. Give it more memory and this likely inverts.
 - **CognoDB** delivered a fully correct, zero-failure run of every workload and
   showed no free-tier throttling. Its aggregation path is roughly an order of
   magnitude slower than the self-hosted engines. **Its traversal and lookup
